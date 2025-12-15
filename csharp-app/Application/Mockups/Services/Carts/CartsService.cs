@@ -3,15 +3,16 @@ using Mockups.Models.Menu;
 using Mockups.Repositories.Carts;
 using Mockups.Repositories.MenuItems;
 using Mockups.Storage;
+using Mockups.Services.MenuItems;
 
 namespace Mockups.Services.Carts
 {
     public class CartsService : ICartsService
     {
         private readonly CartsRepository _cartsRepository;
-        private readonly MenuItemRepository _menuItemRepository;
+        private readonly IMenuItemRepository _menuItemRepository;
 
-        public CartsService(MenuItemRepository menuItemRepository, CartsRepository cartsRepository)
+        public CartsService(IMenuItemRepository menuItemRepository, CartsRepository cartsRepository)
         {
             _menuItemRepository = menuItemRepository;
             _cartsRepository = cartsRepository;

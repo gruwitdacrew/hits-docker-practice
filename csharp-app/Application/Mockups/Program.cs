@@ -47,7 +47,7 @@ builder.Services.AddScoped<ICartsService, CartsService>();
 builder.Services.AddScoped<IOrdersService, OrdersService>();
 
 builder.Services.AddScoped<AddressRepository>();
-builder.Services.AddScoped<MenuItemRepository>();
+builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
 builder.Services.AddScoped<OrdersRepository>();
 builder.Services.AddSingleton<CartsRepository>();
 

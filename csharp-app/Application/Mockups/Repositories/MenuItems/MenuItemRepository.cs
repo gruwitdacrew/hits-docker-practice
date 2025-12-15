@@ -1,10 +1,11 @@
 ﻿using Mockups.Models.Menu;
 using Mockups.Storage;
 using Microsoft.EntityFrameworkCore;
+using Mockups.Services.MenuItems;
 
 namespace Mockups.Repositories.MenuItems
 {
-    public class MenuItemRepository
+    public class MenuItemRepository : IMenuItemRepository
     {
         private readonly ApplicationDbContext _context;
 

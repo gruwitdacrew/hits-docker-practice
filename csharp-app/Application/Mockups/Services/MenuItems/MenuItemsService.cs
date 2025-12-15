@@ -9,12 +9,12 @@ namespace Mockups.Services.MenuItems
     public class MenuItemsService : IMenuItemsService
     {
         private readonly IWebHostEnvironment _environment;
-        private readonly MenuItemRepository _menuItemRepository;
+        private readonly IMenuItemRepository _menuItemRepository;
         private readonly ICartsService _cartsService;
         
         private static string[] AllowedExtensions { get; set; } = { "jpg", "jpeg", "png" };
 
-        public MenuItemsService(IWebHostEnvironment environment, MenuItemRepository menuItemRepository, ICartsService cartsService)
+        public MenuItemsService(IWebHostEnvironment environment, IMenuItemRepository menuItemRepository, ICartsService cartsService)
         {
             _environment = environment;
             _menuItemRepository = menuItemRepository;
