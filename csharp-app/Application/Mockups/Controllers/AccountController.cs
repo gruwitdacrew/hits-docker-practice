@@ -61,9 +61,15 @@ namespace Mockups.Controllers
                     await _usersService.Login(model);
                     return RedirectToAction("Index", "Menu");
                 }
-                catch (Exception ex)
+                catch (ArgumentException ex)
                 {
+                    // Handle expected business logic errors like invalid credentials
                     ModelState.AddModelError("Errors", ex.Message);
+                }
+                catch (Exception)
+                {
+                    // Handle unexpected errors without exposing internal details
+                    ModelState.AddModelError("Errors", "An error occurred during login. Please try again.");
                 }
             }
             return View(model);
@@ -81,7 +87,13 @@ namespace Mockups.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            var userId = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value);
+            // Validate and parse user ID safely
+            var userIdClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
+            {
+                return Unauthorized();
+            }
+
             var userInfo = await _usersService.GetUserInfo(userId);
             return View(userInfo);
         }
@@ -100,15 +112,27 @@ namespace Mockups.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Validate and parse user ID safely
+                var userIdClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
+                {
+                    return Unauthorized();
+                }
+
                 try
                 {
-                    var userId = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value);
                     await _addressesService.AddAddress(model, userId);
                     return RedirectToAction("Index", "Account");
                 }
-                catch (Exception ex)
+                catch (ArgumentException ex)
                 {
+                    // Handle expected business logic errors
                     ModelState.AddModelError("Errors", ex.Message);
+                }
+                catch (Exception)
+                {
+                    // Handle unexpected errors without exposing internal details
+                    ModelState.AddModelError("Errors", "An error occurred while adding the address. Please try again.");
                 }
             }
             return View(model);
@@ -207,8 +231,13 @@ namespace Mockups.Controllers
         [Authorize]
         public async Task<IActionResult> Edit()
         {
-            
-            var userId = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value);
+            // Validate and parse user ID safely
+            var userIdClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
+            {
+                return Unauthorized();
+            }
+
             var model = await _usersService.GetEditUserDataViewModel(userId);
             return View(model);
         }
@@ -220,19 +249,31 @@ namespace Mockups.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Validate and parse user ID safely
+                var userIdClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
+                {
+                    return Unauthorized();
+                }
+
                 try
                 {
-                    var userId = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value);
                     await _usersService.EditUserData(model, userId);
                     return RedirectToAction("Index", "Account");
                 }
-                catch (KeyNotFoundException e)
+                catch (KeyNotFoundException)
                 {
                     return NotFound();
                 }
-                catch (Exception ex)
+                catch (ArgumentException ex)
                 {
+                    // Handle expected business logic errors
                     ModelState.AddModelError("Errors", ex.Message);
+                }
+                catch (Exception)
+                {
+                    // Handle unexpected errors without exposing internal details
+                    ModelState.AddModelError("Errors", "An error occurred while updating user data. Please try again.");
                 }
             }
             return View(model);

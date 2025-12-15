@@ -20,7 +20,15 @@ namespace Mockups.Services.Carts
 
         public async Task AddItemToCart(Guid userId, string itemId, int amount)
         {
-            var itemGuid = Guid.Parse(itemId);
+            if (string.IsNullOrEmpty(itemId) || !Guid.TryParse(itemId, out Guid itemGuid))
+            {
+                throw new ArgumentException("Invalid menu item ID format");
+            }
+
+            if (amount <= 0)
+            {
+                throw new ArgumentException("Amount must be greater than 0");
+            }
 
             var item = await _menuItemRepository.GetItemById(itemGuid);
 

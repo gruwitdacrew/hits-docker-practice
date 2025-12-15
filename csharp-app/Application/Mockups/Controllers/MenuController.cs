@@ -50,9 +50,16 @@ namespace Mockups.Controllers
                 await _menuItemsService.CreateMenuItem(model);
                 return RedirectToAction("Index");
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
+                // Handle expected business logic errors
                 ModelState.AddModelError("", ex.Message);
+                return View(model);
+            }
+            catch (Exception)
+            {
+                // Handle unexpected errors without exposing internal details
+                ModelState.AddModelError("", "An error occurred while creating the menu item. Please try again.");
                 return View(model);
             }
         }
@@ -120,11 +127,37 @@ namespace Mockups.Controllers
         [Authorize]
         public async Task<IActionResult> AddToCartPost(string id, int amount)
         {
+            // Validate amount
+            if (amount <= 0)
+            {
+                ModelState.AddModelError(nameof(amount), "Amount must be greater than 0.");
+                var model = await _menuItemsService.GetAddToCartModel(id);
+                return View(model);
+            }
 
-            var userId = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value);
+            // Validate and parse user ID safely
+            var userIdClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
+            {
+                return Unauthorized();
+            }
 
-            await _menuItemsService.AddItemToCart(userId, id, amount);
-            return RedirectToAction("Index", "Menu");
+            try
+            {
+                await _menuItemsService.AddItemToCart(userId, id, amount);
+                return RedirectToAction("Index", "Menu");
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (Exception)
+            {
+                // Log the actual error internally while showing a generic message
+                ModelState.AddModelError("", "An error occurred while adding the item to cart. Please try again.");
+                var model = await _menuItemsService.GetAddToCartModel(id);
+                return View(model);
+            }
         }
 
     }

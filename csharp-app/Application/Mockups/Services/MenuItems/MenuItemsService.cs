@@ -33,15 +33,37 @@ namespace Mockups.Services.MenuItems
             var fileNameWithPath = string.Empty;
             if (isFileAttached)
             {
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-                var extension = Path.GetExtension(model.File.FileName).Replace(".", "");
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
+                // Validate file extension
+                var extension = Path.GetExtension(model.File.FileName).Replace(".", "").ToLowerInvariant();
                 if (!AllowedExtensions.Contains(extension))
                 {
-                    throw new ArgumentException("Attached file's extention is not supported");
+                    throw new ArgumentException("Attached file's extension is not supported");
                 }
+
+                // Validate file size (max 5MB)
+                if (model.File.Length > 5 * 1024 * 1024)
+                {
+                    throw new ArgumentException("File size cannot exceed 5MB");
+                }
+
+                // Validate file content type
+                var contentType = model.File.ContentType.ToLowerInvariant();
+                if (!contentType.Contains("image/"))
+                {
+                    throw new ArgumentException("Only image files are allowed");
+                }
+
                 fileNameWithPath = $"files/{Guid.NewGuid()}-{model.File.FileName}";
-                using (var fs = new FileStream(Path.Combine(_environment.WebRootPath, fileNameWithPath), FileMode.Create))
+                var fullPath = Path.Combine(_environment.WebRootPath, fileNameWithPath);
+
+                // Ensure directory exists
+                var directory = Path.GetDirectoryName(fullPath);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                using (var fs = new FileStream(fullPath, FileMode.Create))
                 {
                     await model.File.CopyToAsync(fs);
                 }
@@ -101,7 +123,10 @@ namespace Mockups.Services.MenuItems
 
         public async Task<bool?> DeleteMenuItem(string id)
         {
-            var guid = Guid.Parse(id);
+            if (!Guid.TryParse(id, out Guid guid))
+            {
+                throw new ArgumentException("Invalid menu item ID format");
+            }
 
             var item = await _menuItemRepository.GetItemById(guid);
 
@@ -145,7 +170,10 @@ namespace Mockups.Services.MenuItems
 
         public async Task<AddToCartViewModel> GetAddToCartModel(string itemId)
         {
-            var itemGuid = Guid.Parse(itemId);
+            if (!Guid.TryParse(itemId, out Guid itemGuid))
+            {
+                throw new ArgumentException("Invalid menu item ID format");
+            }
 
             var item = await _menuItemRepository.GetItemById(itemGuid);
 
