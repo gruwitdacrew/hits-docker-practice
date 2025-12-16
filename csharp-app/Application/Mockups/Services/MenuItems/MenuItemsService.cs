@@ -54,7 +54,10 @@ namespace Mockups.Services.MenuItems
                 }
 
                 fileNameWithPath = $"files/{Guid.NewGuid()}-{model.File.FileName}";
-                var fullPath = Path.Combine(_environment.WebRootPath, fileNameWithPath);
+
+                // Ensure WebRootPath is not null
+                var webRootPath = _environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                var fullPath = Path.Combine(webRootPath, fileNameWithPath);
 
                 // Ensure directory exists
                 var directory = Path.GetDirectoryName(fullPath);

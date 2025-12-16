@@ -9,8 +9,6 @@ namespace Mockups.Storage
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-            //Database.EnsureDeleted();
-            Database.EnsureCreated();
         }
 
         public override DbSet<User> Users { get; set; }
@@ -20,6 +18,7 @@ namespace Mockups.Storage
         public DbSet<MenuItem> MenuItems { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderMenuItem> OrderMenuItems { get; set; }
+        public DbSet<CartAddition> CartAdditions { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -64,7 +63,15 @@ namespace Mockups.Storage
                     q.OrderId,
                     q.ItemId
                 });
-                
+
+            });
+            builder.Entity<CartAddition>(o =>
+            {
+                o.ToTable("CartAdditions");
+                o.HasOne(ca => ca.MenuItem)
+                 .WithMany(mi => mi.CartAdditions)  // Connect to the CartAdditions property in MenuItem
+                 .HasForeignKey(ca => ca.MenuItemId)
+                 .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

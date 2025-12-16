@@ -1,0 +1,26 @@
+@{
+    ViewData["Title"] = "Аналитика";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model Mockups.Models.Analytics.AnalyticsViewModel
+
+<div class="container mt-4">
+    <h2 class="mb-4">Аналитика</h2>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Конверсия</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Всего добавлений в корзину:</strong> @Model.ConversionRateData.TotalCartAdditions</p>
+                    <p><strong>Всего покупок:</strong> @Model.ConversionRateData.TotalPurchases</p>
+                    <p><strong>Процент конверсии:</strong> @Model.ConversionRateData.ConversionRatePercentage%</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

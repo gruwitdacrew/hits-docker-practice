@@ -1,5 +1,6 @@
 ﻿using Mockups.Models;
 using Mockups.Models.Menu;
+using Mockups.Services.Analytics;
 using Mockups.Services.Carts;
 using Mockups.Services.MenuItems;
 using Mockups.Storage;
@@ -14,11 +15,13 @@ namespace Mockups.Controllers
     {
         private readonly IMenuItemsService _menuItemsService;
         private readonly ICartsService _cartsService;
+        private readonly IAnalyticsService _analyticsService;
 
-        public MenuController(IMenuItemsService menuItemsService, ICartsService cartsService)
+        public MenuController(IMenuItemsService menuItemsService, ICartsService cartsService, IAnalyticsService analyticsService)
         {
             _menuItemsService = menuItemsService;
             _cartsService = cartsService;
+            _analyticsService = analyticsService;
         }
 
         [HttpGet]
@@ -144,6 +147,12 @@ namespace Mockups.Controllers
 
             try
             {
+                // Track cart addition for analytics
+                if (Guid.TryParse(id, out Guid menuItemId))
+                {
+                    await _analyticsService.TrackCartAdditionAsync(menuItemId, userIdClaim.Value, null, HttpContext.Connection.RemoteIpAddress?.ToString());
+                }
+
                 await _menuItemsService.AddItemToCart(userId, id, amount);
                 return RedirectToAction("Index", "Menu");
             }
@@ -160,5 +169,34 @@ namespace Mockups.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Details(string? id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return NotFound();
+            }
+
+            var model = await _menuItemsService.GetItemModelById(id);
+            if (model == null)
+            {
+                return NotFound();
+            }
+
+            // Track the product view
+            if (Guid.TryParse(id, out Guid menuItemId))
+            {
+                string? userId = null;
+                var userIdClaim = User?.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+                if (userIdClaim != null)
+                {
+                    userId = userIdClaim.Value;
+                }
+
+                await _analyticsService.TrackCartAdditionAsync(menuItemId, userId, null, HttpContext.Connection.RemoteIpAddress?.ToString());
+            }
+
+            return View(model);
+        }
     }
 }

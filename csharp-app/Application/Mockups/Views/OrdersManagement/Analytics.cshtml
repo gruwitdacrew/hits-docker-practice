@@ -1,0 +1,53 @@
+@model Mockups.Models.OrdersManagement.AnalyticsViewModel
+
+@{
+    ViewData["Title"] = "Аналитика конверсии";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <h2>Аналитика по конверсии</h2>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card bg-light mb-3">
+                <div class="card-header">Общее количество добавлений в корзину</div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.TotalCartAdditions</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light mb-3">
+                <div class="card-header">Общее количество покупок</div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.TotalPurchases</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white mb-3">
+                <div class="card-header">Процент конверсии</div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.ConversionRatePercentage%</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Описание метрик</h4>
+            <ul>
+                <li><strong>Добавления в корзину:</strong> количество раз, когда пользователи добавляли товары в свою корзину.</li>
+                <li><strong>Покупки:</strong> общее количество товаров, оформленных в заказы (купленные товары).</li>
+                <li><strong>Конверсия:</strong> соотношение количества купленных товаров к количеству добавлений в корзину, выраженное в процентах.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a asp-controller="AdminAnalytics" asp-action="Index" class="btn btn-info">Перейти к полной аналитике</a>
+        <a asp-action="Index" class="btn btn-primary">Назад к управлению заказами</a>
+    </div>
+</div>

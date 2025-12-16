@@ -1,0 +1,33 @@
+@model Mockups.Models.Menu.MenuItemViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<h2>@Model.Name</h2>
+
+<div>
+    @if (!string.IsNullOrEmpty(Model.PhotoPath))
+    {
+        <img src="@Model.PhotoPath" alt="@Model.Name" style="max-width: 300px; max-height: 300px;" />
+    }
+</div>
+
+<div>
+    <h4>Description</h4>
+    <p>@Model.Description</p>
+    
+    <h4>Price</h4>
+    <p>@Model.Price.ToString("C")</p>
+    
+    <h4>Category</h4>
+    <p>@Model.Category</p>
+    
+    <h4>Dietary Info</h4>
+    <p>@(Model.IsVegan ? "Vegan" : "Not Vegan")</p>
+</div>
+
+<div>
+    <a asp-controller="Menu" asp-action="AddToCart" asp-route-id="@Model.Id" class="btn btn-primary">Add to Cart</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to Menu</a>
+</div>

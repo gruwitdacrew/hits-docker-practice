@@ -14,5 +14,6 @@ namespace Mockups.Storage
         public string PhotoPath { get; set; }
         public bool IsDeleted { get; set; } = false;
         public List<OrderMenuItem> OrderMenuItems { get; set; } = new List<OrderMenuItem>();
+        public List<CartAddition> CartAdditions { get; set; } = new List<CartAddition>();
     }
 }

@@ -13,11 +13,19 @@ using Mockups.Services.MenuItems;
 using Mockups.Repositories.Orders;
 using Mockups.Services.Orders;
 using Mockups.Services.CartsCleanerService;
+using Mockups.Services.Analytics;
+using Mockups;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 #region Configs
 OrderConfig OrderConfig = new OrderConfig();
@@ -45,6 +53,7 @@ builder.Services.AddScoped<IAddressesService, AddressesService>();
 builder.Services.AddScoped<IMenuItemsService, MenuItemsService>();
 builder.Services.AddScoped<ICartsService, CartsService>();
 builder.Services.AddScoped<IOrdersService, OrdersService>();
+builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 
 builder.Services.AddScoped<AddressRepository>();
 builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
@@ -81,6 +90,14 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Apply database migrations at startup
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.EnsureCreated();
+}
+
+
 #region Middlewares
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -89,6 +106,9 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseSession();
+
 #endregion
 
 await app.ConfigureIdentityAsync();

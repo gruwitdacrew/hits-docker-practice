@@ -1,6 +1,7 @@
 ﻿using Mockups.Models.Account;
 using Mockups.Repositories.Addresses;
 using Mockups.Services.Addresses;
+using Mockups.Services.Analytics;
 using Mockups.Storage;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -13,14 +14,17 @@ namespace Mockups.Services.Users
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IAddressesService _addressesService;
+        private readonly IAnalyticsService _analyticsService;
 
         public UsersService(UserManager<User> userManager,
                 SignInManager<User> signInManager,
-                IAddressesService addressesService)
+                IAddressesService addressesService,
+                IAnalyticsService analyticsService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _addressesService = addressesService;
+            _analyticsService = analyticsService;
         }
 
 
@@ -38,6 +42,9 @@ namespace Mockups.Services.Users
             {
                 throw new InvalidDataException("Incorrect password.");
             }
+
+            // Update user's last online time
+            await _analyticsService.UpdateUserLastOnlineAsync(user.Id);
 
             // Далее генерируем набор клеймов, состоящих из необходимых для быстрого доступа данных
             var claims = new List<Claim>
@@ -81,6 +88,9 @@ namespace Mockups.Services.Users
             if (userCreationResult.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, ApplicationRoleNames.User);
+
+                // Update user's last online time for new user
+                await _analyticsService.UpdateUserLastOnlineAsync(user.Id);
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 return;

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mockups.Storage;
 
@@ -11,9 +12,11 @@ using Mockups.Storage;
 namespace Mockups.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251216061005_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,34 +154,6 @@ namespace Mockups.Migrations
                     b.ToTable("Addresses", (string)null);
                 });
 
-            modelBuilder.Entity("Mockups.Storage.CartAddition", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("AdditionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("IpAddress")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("MenuItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("SessionId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MenuItemId");
-
-                    b.ToTable("CartAdditions", (string)null);
-                });
-
             modelBuilder.Entity("Mockups.Storage.MenuItem", b =>
                 {
                     b.Property<Guid>("Id")
@@ -269,6 +244,34 @@ namespace Mockups.Migrations
                     b.ToTable("OrderMenuItems", (string)null);
                 });
 
+            modelBuilder.Entity("Mockups.Storage.ProductView", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("MenuItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SessionId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ViewDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MenuItemId");
+
+                    b.ToTable("ProductViews", (string)null);
+                });
+
             modelBuilder.Entity("Mockups.Storage.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -323,9 +326,6 @@ namespace Mockups.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastOnline")
-                        .HasColumnType("datetime2");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -396,7 +396,6 @@ namespace Mockups.Migrations
                     b.ToTable("UserRoles", (string)null);
                 });
 
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Mockups.Storage.Role", null)
@@ -444,17 +443,6 @@ namespace Mockups.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Mockups.Storage.CartAddition", b =>
-                {
-                    b.HasOne("Mockups.Storage.MenuItem", "MenuItem")
-                        .WithMany("CartAdditions")
-                        .HasForeignKey("MenuItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MenuItem");
-                });
-
             modelBuilder.Entity("Mockups.Storage.Order", b =>
                 {
                     b.HasOne("Mockups.Storage.User", "User")
@@ -485,6 +473,17 @@ namespace Mockups.Migrations
                     b.Navigation("Order");
                 });
 
+            modelBuilder.Entity("Mockups.Storage.ProductView", b =>
+                {
+                    b.HasOne("Mockups.Storage.MenuItem", "MenuItem")
+                        .WithMany("ProductViews")
+                        .HasForeignKey("MenuItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MenuItem");
+                });
+
             modelBuilder.Entity("Mockups.Storage.UserRole", b =>
                 {
                     b.HasOne("Mockups.Storage.Role", "Role")
@@ -504,12 +503,11 @@ namespace Mockups.Migrations
                     b.Navigation("User");
                 });
 
-
             modelBuilder.Entity("Mockups.Storage.MenuItem", b =>
                 {
-                    b.Navigation("CartAdditions");
-
                     b.Navigation("OrderMenuItems");
+
+                    b.Navigation("ProductViews");
                 });
 
             modelBuilder.Entity("Mockups.Storage.Order", b =>
