@@ -8,19 +8,41 @@
 <div class="container mt-4">
     <h2 class="mb-4">Аналитика</h2>
 
-    <div class="row">
-        <div class="col-md-6">
+    <div class="row mb-4">
+        <div class="col-md-4">
             <div class="card">
-                <div class="card-header">
-                    <h5>Конверсия</h5>
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Конверсия</h3>
                 </div>
                 <div class="card-body">
-                    <p><strong>Всего добавлений в корзину:</strong> @Model.ConversionRateData.TotalCartAdditions</p>
-                    <p><strong>Всего покупок:</strong> @Model.ConversionRateData.TotalPurchases</p>
-                    <p><strong>Процент конверсии:</strong> @Model.ConversionRateData.ConversionRatePercentage%</p>
+                    <p class="mb-1"><strong>Всего добавлений в корзину:</strong> @Model.ConversionRateData.TotalCartAdditions</p>
+                    <p class="mb-1"><strong>Всего покупок:</strong> @Model.ConversionRateData.TotalPurchases</p>
+                    <p class="mb-0"><strong>Процент конверсии:</strong> @Model.ConversionRateData.ConversionRatePercentage%</p>
                 </div>
             </div>
         </div>
 
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">Последний месяц</h3>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Количество заказов:</strong> @Model.LastMonthData.OrdersCount</p>
+                    <p class="mb-0"><strong>Выручка:</strong> @Model.LastMonthData.Revenue ₽</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">Поведение клиентов</h3>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0"><strong>Среднее время между заказами:</strong> @Model.CustomerBehaviorData.AverageTimeBetweenOrdersFormatted</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
