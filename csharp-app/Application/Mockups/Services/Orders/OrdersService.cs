@@ -39,8 +39,12 @@ namespace Mockups.Services.Orders
             var price = 0f;
             foreach (var item in cartItems)
             {
-                var itemPrice = (await _menuItemsService.GetItemModelById(item.Id.ToString())).Price * item.Amount;
-                price += itemPrice;
+                var menuItem = await _menuItemsService.GetItemModelById(item.Id.ToString());
+                if (menuItem != null)
+                {
+                    var itemPrice = menuItem.Price * item.Amount;
+                    price += itemPrice;
+                }
             }
 
             var discount = 0f;
@@ -140,12 +144,26 @@ namespace Mockups.Services.Orders
 
             var addresses = _addressesService.GetAddressesByUserId(userId);
             var addressStrings = new List<string>();
-            addressStrings.Add(addresses.Where(a => a.IsMainAddress == true).First().GetAddressString());
+
+            // Сначала добавляем основной адрес, если он есть
+            var mainAddress = addresses.FirstOrDefault(a => a.IsMainAddress);
+            if (mainAddress != null)
+            {
+                addressStrings.Add(mainAddress.GetAddressString());
+            }
+            else if (addresses.Any())
+            {
+                // Если нет основного адреса, используем первый доступный
+                addressStrings.Add(addresses.First().GetAddressString());
+            }
+
+            // Затем добавляем все остальные адреса
             foreach (var address in addresses)
             {
-                if (!addressStrings.Contains(address.GetAddressString()))
+                var addressString = address.GetAddressString();
+                if (!addressStrings.Contains(addressString))
                 {
-                    addressStrings.Add(address.GetAddressString());
+                    addressStrings.Add(addressString);
                 }
             }
 
@@ -161,8 +179,12 @@ namespace Mockups.Services.Orders
             var price = 0f;
             foreach (var item in cartItems)
             {
-                var itemPrice = (await _menuItemsService.GetItemModelById(item.Id.ToString())).Price * item.Amount;
-                price += itemPrice;
+                var menuItem = await _menuItemsService.GetItemModelById(item.Id.ToString());
+                if (menuItem != null)
+                {
+                    var itemPrice = menuItem.Price * item.Amount;
+                    price += itemPrice;
+                }
             }
 
             var discount = 0f;

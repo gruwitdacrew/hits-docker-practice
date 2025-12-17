@@ -65,7 +65,12 @@
                                 {
                                     <a class="btn btn-sm btn-danger" asp-controller="Menu" asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
                                 }
-                                <a class="btn btn-sm btn-primary" asp-controller="Menu" asp-action="AddToCart" asp-route-id="@item.Id">В корзину</a>
+                                <a class="btn btn-sm btn-primary" asp-controller="Menu" asp-action="AddToCart" asp-route-id="@item.Id" data-menu-item-id="@item.Id">В корзину</a>
+                            }
+                            else
+                            {
+                                <!-- Добавляем data-атрибут с ID для нужд тестирования -->
+                                <span class="data-menu-item-id" style="display:none;" data-menu-item-id="@item.Id">@item.Id</span>
                             }
                         </div>
                     </div>

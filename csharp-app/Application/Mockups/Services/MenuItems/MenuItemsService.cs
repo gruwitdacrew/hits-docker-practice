@@ -145,7 +145,10 @@ namespace Mockups.Services.MenuItems
 
         public async Task<MenuItemViewModel?> GetItemModelById(string id)
         {
-            var guid = Guid.Parse(id);
+            if (!Guid.TryParse(id, out Guid guid))
+            {
+                return null;
+            }
 
             var item = await _menuItemRepository.GetItemById(guid);
 

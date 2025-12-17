@@ -1,5 +1,6 @@
 ﻿using Mockups.Storage;
 using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 
 namespace Mockups.Configs
 {
@@ -58,6 +59,74 @@ namespace Mockups.Configs
                 {
                     throw new InvalidOperationException($"Unable to create {ApplicationRoleNames.User} role.");
                 }
+            }
+
+            // Add sample menu items if none exist
+            await AddSampleMenuItemsAsync(serviceScope);
+        }
+
+        private static async Task AddSampleMenuItemsAsync(IServiceScope serviceScope)
+        {
+            var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
+            // Check if there are any menu items already
+            if (!context.MenuItems.Any())
+            {
+                var sampleItems = new List<MenuItem>
+                {
+                    new MenuItem
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Борщ",
+                        Price = 150.0f,
+                        Description = "Традиционный украинский борщ с капустой, свеклой и мясом",
+                        Category = MenuItemCategory.Soup,
+                        IsVegan = false,
+                        PhotoPath = "/images/borsch.jpg"
+                    },
+                    new MenuItem
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Овощной суп",
+                        Price = 120.0f,
+                        Description = "Вегетарианский суп из свежих овощей",
+                        Category = MenuItemCategory.Soup,
+                        IsVegan = true,
+                        PhotoPath = "/images/vegetable_soup.jpg"
+                    },
+                    new MenuItem
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Стейк из говядины",
+                        Price = 450.0f,
+                        Description = "Сочный стейк из говядины премиум класса",
+                        Category = MenuItemCategory.WOK,
+                        IsVegan = false,
+                        PhotoPath = "/images/beef_steak.jpg"
+                    },
+                    new MenuItem
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Паста Карбонара",
+                        Price = 320.0f,
+                        Description = "Итальянская паста с беконом и соусом карбонара",
+                        Category = MenuItemCategory.WOK,
+                        IsVegan = false,
+                        PhotoPath = "/images/carbonara.jpg"
+                    },
+                    new MenuItem
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Фруктовый салат",
+                        Price = 200.0f,
+                        Description = "Свежие фрукты в сезонном ассортименте",
+                        Category = MenuItemCategory.Dessert,
+                        IsVegan = true,
+                        PhotoPath = "/images/fruit_salad.jpg"
+                    }
+                };
+
+                await context.MenuItems.AddRangeAsync(sampleItems);
+                await context.SaveChangesAsync();
             }
         }
 
