@@ -13,12 +13,12 @@ jobs:
 
     - name: Restore dependencies
       run: |
-        cd Application
+        cd csharp-app/Application
         dotnet restore
 
     - name: Run Unit Tests
       run: |
-        cd Application
+        cd csharp-app/Application
         dotnet test ./Mockups.Tests/UnitTest/Mockups.Tests.csproj --no-build --configuration Release
 
   build-and-deploy:
@@ -31,6 +31,7 @@ jobs:
 
     - name: Build and deploy with Docker Compose
       run: |
+        cd csharp-app
         docker-compose down  # Останавливаем старую версию
         docker-compose up -d --build  # Собираем и запускаем новую версию
 
@@ -45,7 +46,7 @@ jobs:
       run: |
         sleep 30  # Ждем пока приложение запустится после деплоя
         # Запускаем нагрузочный тест на уже развернутом приложении
-        cd Application
+        cd csharp-app/Application
         dotnet run --project ./Mockups.Tests/LoadTest/LoadTest.csproj
       env:
         LOAD_TEST_BASE_URL: http://localhost:5146
