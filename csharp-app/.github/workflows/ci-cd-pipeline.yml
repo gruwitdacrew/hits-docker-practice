@@ -1,0 +1,58 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  unit-test:
+    runs-on: [self-hosted] # Используем ваш подготовленный раннер
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: |
+        cd Application
+        dotnet restore
+
+    - name: Run Unit Tests
+      run: |
+        cd Application
+        dotnet test ./Mockups.Tests/UnitTest/Mockups.Tests.csproj --no-build --configuration Release
+
+  build-and-deploy:
+    runs-on: [self-hosted] # Используем ваш подготовленный раннер
+    needs: unit-test
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Build and deploy with Docker Compose
+      run: |
+        docker-compose down  # Останавливаем старую версию
+        docker-compose up -d --build  # Собираем и запускаем новую версию
+
+  load-test:
+    runs-on: [self-hosted] # Используем ваш подготовленный раннер
+    needs: build-and-deploy
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run Load Tests on deployed app
+      run: |
+        sleep 30  # Ждем пока приложение запустится после деплоя
+        # Запускаем нагрузочный тест на уже развернутом приложении
+        cd Application
+        dotnet run --project ./Mockups.Tests/LoadTest/LoadTest.csproj
+      env:
+        LOAD_TEST_BASE_URL: http://localhost:5146
+        LOAD_TEST_USER_EMAIL: Java@DlyaLox.ov
+        LOAD_TEST_USER_PASSWORD: ".NetDlyaPacan0v"
